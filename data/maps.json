@@ -3,9 +3,26 @@
   "tracker": "kodomo-sns",
   "reactions": "kodomo-sns",
   "links": [
-   ["合意点マップ「子どもとSNS」（論点に賛否を押す）", "https://kurage.exbridge.jp/kconsensus.php/t/kodomo-sns/?ref=kronten-kodomo-sns"],
-   ["国会トラッカー「子どもとSNS」（国会の全発言）", "https://xb4g.com/giin/tracker/kodomo-sns?ref=kronten-kodomo-sns"],
-   ["チームみらいの「みらい版Pol.is」はもうある（VWork Blog）", "https://exbridge.jp/vibeblog/2026-10-08-kconsensus-kodomo-sns-polis.html?ref=kronten-kodomo-sns"]
+   [
+    "合意点マップ「子どもとSNS」（論点に賛否を押す）",
+    "https://kurage.exbridge.jp/kconsensus.php/t/kodomo-sns/?ref=kronten-kodomo-sns"
+   ],
+   [
+    "国会トラッカー「子どもとSNS」（国会の全発言）",
+    "https://xb4g.com/giin/tracker/kodomo-sns?ref=kronten-kodomo-sns"
+   ],
+   [
+    "チームみらいの「みらい版Pol.is」はもうある（VWork Blog）",
+    "https://exbridge.jp/vibeblog/2026-10-08-kconsensus-kodomo-sns-polis.html?ref=kronten-kodomo-sns"
+   ],
+   [
+    "広聴AIでは出ない「賛否」と「国会とネットのずれ」（VWork Blog）",
+    "https://exbridge.jp/vibeblog/2026-10-08-kouchou-ai-ronten-ai-map.html?ref=kronten-kodomo-sns"
+   ],
+   [
+    "論点AIマップを作った経緯（動画・約2分）",
+    "https://kurage.exbridge.jp/kuragev.php?id=ef99d6656f9c41fe"
+   ]
   ]
  }
 }
