@@ -8,7 +8,7 @@ BASE = "https://kurage.exbridge.jp/kronten.php"
 LOGO = "https://exbridge.jp/images/logo-mark-128.png"
 TRACK = ('<script>(function(){var s=document.createElement("script");s.src="https://kurage.exbridge.jp/simpletrack.php?url="'
          '+encodeURIComponent(location.href)+"&ref="+encodeURIComponent(document.referrer);document.head.appendChild(s)})();</script>')
-STORE = "https://kappstore.exbridge.jp/"
+STORE = "https://kappstore.exbridge.jp/app.php?id=10cb19eab638123f&"
 GITHUB = "https://github.com/katsushi2441/kronten"
 MASCOT = "https://kurage.exbridge.jp/images/kurage_mascot_simple_v2.png"
 COLORS = ["#0a9a8f", "#e07a2e", "#4a6fd1", "#c2417a", "#6a9a1f", "#8a55c7", "#d4a017",
@@ -162,7 +162,7 @@ svg .cl{{font-size:11px;font-weight:900;fill:#12202f}}
 <p>作成 {h(m.get('built_at', ''))}　株式会社エクスブリッジ（名古屋）</p></section>
 {('<section class="card"><p class="sub" style="margin-top:0">関連するページ</p><ul class="rel">' + ''.join(f'<li><a href="{h(u)}">{h(t)}</a></li>' for t, u in links) + '</ul></section>') if links else ''}
 <section class="card"><p class="sub" style="margin-top:0">このシステムについて</p>
-<p>Kurage 論点AIマップは、国会の発言・SNS・ニュースのコメント・アンケートの自由記述など「すでにある声」から、話題の地図と論点を作るシステムです。AI エージェントからは MCP で引けます（<a href="{BASE}/about#mcp">使い方</a>）。ソースコードは <a href="{GITHUB}">GitHub</a>（MIT）、自社のサーバーに置く版は <a href="{STORE}?ref=kronten-map">Kurage App Store</a> にあります。</p></section>
+<p>Kurage 論点AIマップは、国会の発言・SNS・ニュースのコメント・アンケートの自由記述など「すでにある声」から、話題の地図と論点を作るシステムです。AI エージェントからは MCP で引けます（<a href="{BASE}/about#mcp">使い方</a>）。ソースコードは <a href="{GITHUB}">GitHub</a>（MIT）、自社のサーバーに置く版は <a href="{STORE}ref=kronten-map">Kurage App Store</a> にあります。</p></section>
 </main></body></html>"""
 
 
@@ -197,7 +197,7 @@ pre{{padding:10px;overflow-x:auto}} a{{color:var(--teal)}}
 </style></head><body>
 <header><div class="hd"><a href="{BASE}/"><img src="{LOGO}" width="34" height="34" alt="株式会社エクスブリッジ">Kurage 論点AIマップ</a></div></header>
 <main class="wrap">{body}
-<p class="lead" style="font-size:13px">株式会社エクスブリッジ（名古屋）　<a href="{BASE}/about">このシステムについて・MCP</a>　<a href="{GITHUB}">GitHub</a>　<a href="{STORE}?ref=kronten-foot">Kurage App Store</a></p>
+<p class="lead" style="font-size:13px">株式会社エクスブリッジ（名古屋）　<a href="{BASE}/about">このシステムについて・MCP</a>　<a href="{GITHUB}">GitHub</a>　<a href="{STORE}ref=kronten-foot">Kurage App Store</a></p>
 </main></body></html>"""
 
 
@@ -218,7 +218,7 @@ def render_index(maps):
 <p>立てた論点は、<a href="https://kurage.exbridge.jp/kconsensus.php/?ref=kronten">Kurage 合意点マップ</a>に渡して、賛否と合意点を集めます。</p></section>
 <section class="card"><h2>自社・自治体・議員事務所で使う</h2>
 <p>パブリックコメント、住民アンケート、議員事務所に届いた声、社内アンケートの自由記述などを CSV で入れれば、同じ地図と論点が作れます。自社のサーバーで動くので、声を外に出しません。</p>
-<a class="btn" href="{STORE}?ref=kronten-top">Kurage App Store で見る</a><a class="btn o" href="{GITHUB}">GitHub（MIT）</a></section>"""
+<a class="btn" href="{STORE}ref=kronten-top">Kurage App Store で見る</a><a class="btn o" href="{GITHUB}">GitHub（MIT）</a></section>"""
     return _page("論点AIマップ｜国会とネットの声から話題と論点を地図にする（Kurage）",
                  "国会の発言・SNS・ニュースのコメントなど、すでにある声から話題の地図と賛否を問える論点を作ります。国会とネットのずれも見えます。MCP対応。",
                  f"{BASE}/", body)
