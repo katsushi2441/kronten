@@ -4,7 +4,12 @@
 """
 import html
 
+BASE = "https://kurage.exbridge.jp/kronten.php"
 LOGO = "https://exbridge.jp/images/logo-mark-128.png"
+TRACK = ('<script>(function(){var s=document.createElement("script");s.src="https://kurage.exbridge.jp/simpletrack.php?url="'
+         '+encodeURIComponent(location.href)+"&ref="+encodeURIComponent(document.referrer);document.head.appendChild(s)})();</script>')
+STORE = "https://kappstore.exbridge.jp/"
+GITHUB = "https://github.com/katsushi2441/kronten"
 MASCOT = "https://kurage.exbridge.jp/images/kurage_mascot_simple_v2.png"
 COLORS = ["#0a9a8f", "#e07a2e", "#4a6fd1", "#c2417a", "#6a9a1f", "#8a55c7", "#d4a017",
           "#2a8bb5", "#b5482a", "#3f7f5f", "#7a6a55", "#5a5ad1", "#a0336a", "#2f9e7e"]
@@ -59,8 +64,11 @@ def gap(m):
 <p class="note">国会の声（質疑・政府答弁）が6割以上のまとまりを「国会」、1割以下を「ネット」に分けています。</p></section>"""
 
 
-def render(m):
+def render(m, slug="", links=None):
+    """links: 関連ページ [(見出し, URL)]。slug があれば kurage の公開ページとして（検索に出す）作る"""
     total = m["n"]
+    links = links or []
+    url = f"{BASE}/t/{slug}/" if slug else ""
     cards = []
     for n, c in enumerate(m["clusters"], 1):
         col = COLORS[c["id"] % len(COLORS)]
@@ -89,9 +97,14 @@ def render(m):
     toc = "".join(f'<a href="#t{c["id"]}"><em>{n}</em>{h(c["name"])}<b>{c["size"]}</b></a>' for n, c in enumerate(m["clusters"], 1))
     return f"""<!doctype html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex">
-<title>{h(m['theme'])}の論点AIマップ｜Kurage 論点AIマップ</title>
-<meta name="description" content="{h(m['theme'])}について、国会の発言とネットの声{total:,}件から、話題の地図と賛否を問える論点を作りました。">
+{'' if slug else '<meta name="robots" content="noindex">'}
+<title>{h(m['theme'])}の論点｜国会とネットの声{total:,}件の論点AIマップ</title>
+<meta name="description" content="{h(m['theme'])}について、国会の発言とネットの声{total:,}件を{m['k']}つの話題にまとめ、賛否を問える論点を立てました。国会とネットで話題がどうずれているかも分かります。">
+{f'<link rel="canonical" href="{url}"><meta property="og:url" content="{url}">' if url else ''}
+<meta property="og:type" content="article"><meta property="og:site_name" content="Kurage 論点AIマップ">
+<meta property="og:title" content="{h(m['theme'])}の論点AIマップ"><meta property="og:image" content="{MASCOT}">
+<meta name="twitter:card" content="summary">
+{TRACK if slug else ''}
 <style>
 :root{{--ink:#12202f;--teal:#0a9a8f;--line:#dfe7ec;--mut:#5d6b7a;--bg:#f5f8fa}}
 *{{box-sizing:border-box;min-width:0}}
@@ -128,12 +141,13 @@ svg{{width:100%;height:auto;background:#fbfdfd;border:1px solid var(--line);bord
 svg .cl{{font-size:11px;font-weight:900;fill:#12202f}}
 .g2{{display:grid;grid-template-columns:1fr 1fr;gap:16px}} .g2 ul{{margin:.3em 0 0;padding-left:1.1em}} .g2 a{{color:var(--ink)}}
 @media(max-width:560px){{.g2{{grid-template-columns:1fr}} .hero img{{width:60px}}}}
+.rel{{margin:0;padding-left:1.1em}} .rel a{{color:var(--teal)}}
 .mut,.note{{color:var(--mut);font-size:13px}}
 </style></head><body>
-<header><div class="hd"><a href="https://proto.exbridge.jp/kronten/"><img src="{LOGO}" width="34" height="34" alt="株式会社エクスブリッジ">Kurage 論点AIマップ</a></div></header>
+<header><div class="hd"><a href="{BASE}/"><img src="{LOGO}" width="34" height="34" alt="株式会社エクスブリッジ">Kurage 論点AIマップ</a></div></header>
 <main class="wrap">
 <div class="hero"><div>
-<p class="kick">RONTEN AI MAP（試作）</p>
+<p class="kick">RONTEN AI MAP</p>
 <h1>{h(m['theme'])}の論点AIマップ</h1>
 <p class="lead">国会の発言とネットの声 {total:,}件を、意味の近さで{m['k']}つの話題にまとめ、話題ごとに「賛成か反対かを問える論点」を立てました。誰がどこで言った声か（国会の質疑・政府の答弁・X・ニュースのコメント）を分けて見られます。</p>
 </div><img src="{MASCOT}" width="84" height="84" alt="Kurage"></div>
@@ -146,4 +160,83 @@ svg .cl{{font-size:11px;font-weight:900;fill:#12202f}}
 <p>国会の発言は、国会会議録検索システムから当社の国会トラッカーが集めたもの（発言を200字前後に区切り、テーマの語を含む部分だけ）。ネットの声は、当社の合意点マップに取り込んだ X の投稿と Yahoo!ニュースのコメントです。</p>
 <p>意味の近さは {h(m['embed_model'])}（手元のCPUで計算）、まとめ方は KMeans（同じ材料なら毎回同じ結果）、話題の名前・要約・論点は {h(m['llm'])}（手元のGPU）で作りました。外部のAIには送っていません。名前と論点はAIの要約なので、必ず代表的な声と元の発言で確かめてください。件数は「声のかたまりの数」で、人数ではありません。</p>
 <p>作成 {h(m.get('built_at', ''))}　株式会社エクスブリッジ（名古屋）</p></section>
+{('<section class="card"><p class="sub" style="margin-top:0">関連するページ</p><ul class="rel">' + ''.join(f'<li><a href="{h(u)}">{h(t)}</a></li>' for t, u in links) + '</ul></section>') if links else ''}
+<section class="card"><p class="sub" style="margin-top:0">このシステムについて</p>
+<p>Kurage 論点AIマップは、国会の発言・SNS・ニュースのコメント・アンケートの自由記述など「すでにある声」から、話題の地図と論点を作るシステムです。AI エージェントからは MCP で引けます（<a href="{BASE}/about#mcp">使い方</a>）。ソースコードは <a href="{GITHUB}">GitHub</a>（MIT）、自社のサーバーに置く版は <a href="{STORE}?ref=kronten-map">Kurage App Store</a> にあります。</p></section>
 </main></body></html>"""
+
+
+def _page(title, desc, url, body):
+    return f"""<!doctype html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{h(title)}</title><meta name="description" content="{h(desc)}">
+<link rel="canonical" href="{url}"><meta property="og:url" content="{url}"><meta property="og:type" content="website">
+<meta property="og:site_name" content="Kurage 論点AIマップ"><meta property="og:title" content="{h(title)}"><meta property="og:image" content="{MASCOT}">
+<meta name="twitter:card" content="summary">{TRACK}
+<style>
+:root{{--ink:#12202f;--teal:#0a9a8f;--line:#dfe7ec;--mut:#5d6b7a;--bg:#f5f8fa}}
+*{{box-sizing:border-box;min-width:0}}
+body{{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans JP",system-ui,sans-serif;line-height:1.8}}
+header{{background:#fff;border-bottom:1px solid var(--line)}}
+.hd{{max-width:860px;margin:0 auto;padding:10px 16px}} .hd a{{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:900}}
+.hd img{{width:34px;height:34px;object-fit:contain}}
+.wrap{{max-width:860px;margin:0 auto;padding:22px 16px 70px;overflow-wrap:anywhere}}
+.kick{{color:var(--teal);font-weight:700;letter-spacing:.09em;font-size:12px;margin:0}}
+h1{{font-size:clamp(22px,4.8vw,32px);margin:.2em 0 .3em;font-weight:900;line-height:1.4}}
+h2{{font-size:19px;margin:0 0 .4em}}
+.lead{{color:var(--mut)}}
+.hero{{display:flex;gap:16px;align-items:flex-start}} .hero img{{width:96px;height:auto;object-fit:contain;flex:none}}
+.card{{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(18,32,47,.05);margin:0 0 16px}}
+.maps a{{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;color:var(--ink);text-decoration:none;margin:0 0 8px}}
+.maps b{{display:block;font-size:17px}} .maps small{{color:var(--mut)}}
+.steps{{padding-left:1.3em}} code,pre{{background:#eef3f6;border-radius:6px;padding:1px 6px;font-size:13px}}
+pre{{padding:10px;overflow-x:auto}} a{{color:var(--teal)}}
+.btn{{display:inline-block;background:var(--teal);color:#fff;font-weight:800;padding:10px 18px;border-radius:99px;text-decoration:none;margin:4px 6px 0 0}}
+.btn.o{{background:#fff;color:var(--teal);border:1px solid var(--teal)}}
+@media(max-width:560px){{.hero img{{width:64px}}}}
+</style></head><body>
+<header><div class="hd"><a href="{BASE}/"><img src="{LOGO}" width="34" height="34" alt="株式会社エクスブリッジ">Kurage 論点AIマップ</a></div></header>
+<main class="wrap">{body}
+<p class="lead" style="font-size:13px">株式会社エクスブリッジ（名古屋）　<a href="{BASE}/about">このシステムについて・MCP</a>　<a href="{GITHUB}">GitHub</a>　<a href="{STORE}?ref=kronten-foot">Kurage App Store</a></p>
+</main></body></html>"""
+
+
+def render_index(maps):
+    """maps: [(slug, map.json の中身)]"""
+    items = "".join(
+        f'<a href="{BASE}/t/{h(s)}/"><b>{h(m["theme"])}</b><small>国会とネットの声 {m["n"]:,}件・{m["k"]}の話題・'
+        f'論点 {sum(len(c["propositions"]) for c in m["clusters"])}本（{h(m.get("built_at", "")[:10])}）</small></a>'
+        for s, m in maps)
+    body = f"""<div class="hero"><div><p class="kick">RONTEN AI MAP</p>
+<h1>論点AIマップ｜国会とネットの声から、話題と論点を地図にする</h1>
+<p class="lead">国会の発言、Xの投稿、ニュースのコメント、アンケートの自由記述。<b>すでに書かれている声</b>を集めて、意味の近さで話題にまとめ、話題ごとに「賛成か反対かを問える論点」を立てます。国会で話されていることと、ネットで話されていることのずれも、地図で見えます。</p></div>
+<img src="{MASCOT}" width="96" height="96" alt="Kurage"></div>
+<section class="card"><h2>論点AIマップ</h2><div class="maps">{items}</div></section>
+<section class="card"><h2>何が違うのか</h2>
+<p>意見を集める道具（AIインタビュー、Pol.is、広聴AIなど）は、たいてい「意見を書いてもらう」ところから始まります。答えに来る人が集まらないと、地図が作れません。論点AIマップは、すでに書かれている声から始めるので、人を待たずに地図ができます。</p>
+<p>声には「どこで・誰が・いつ」が付いたまま残るので、国会の質疑と政府の答弁、会派、年、ネットの投稿を分けて見られます。まとめ方は毎回同じ結果になる方法で、話題の名前と論点だけを手元のAIで作ります。外部のAIには送りません。</p>
+<p>立てた論点は、<a href="https://kurage.exbridge.jp/kconsensus.php/?ref=kronten">Kurage 合意点マップ</a>に渡して、賛否と合意点を集めます。</p></section>
+<section class="card"><h2>自社・自治体・議員事務所で使う</h2>
+<p>パブリックコメント、住民アンケート、議員事務所に届いた声、社内アンケートの自由記述などを CSV で入れれば、同じ地図と論点が作れます。自社のサーバーで動くので、声を外に出しません。</p>
+<a class="btn" href="{STORE}?ref=kronten-top">Kurage App Store で見る</a><a class="btn o" href="{GITHUB}">GitHub（MIT）</a></section>"""
+    return _page("論点AIマップ｜国会とネットの声から話題と論点を地図にする（Kurage）",
+                 "国会の発言・SNS・ニュースのコメントなど、すでにある声から話題の地図と賛否を問える論点を作ります。国会とネットのずれも見えます。MCP対応。",
+                 f"{BASE}/", body)
+
+
+def render_about():
+    body = f"""<p class="kick">ABOUT</p><h1>このシステムについて・MCP</h1>
+<section class="card"><h2>作り方</h2><ol class="steps">
+<li>声を集める。国会の発言は国会会議録検索システムから（当社の国会トラッカー）、ネットの声は X の投稿とニュースのコメント（当社の合意点マップ）。CSV も入れられます。</li>
+<li>国会の発言は200字前後に区切り、テーマの語の組を含む部分だけを使います。</li>
+<li>意味の近さを multilingual-e5-large で計算し、KMeans でまとめます（同じ材料なら毎回同じ結果）。</li>
+<li>まとまりごとに、話題の名前・要約・論点を gemma4（手元のGPU）で作ります。</li>
+</ol>
+<p>話題の名前と論点はAIの要約です。必ず代表的な声と元の発言で確かめてください。件数は声のかたまりの数で、人数ではありません。</p></section>
+<section class="card" id="mcp"><h2>MCP（AI エージェント向け）</h2>
+<p><code>{BASE}/mcp</code>（Streamable HTTP・読み取り専用・登録不要）</p>
+<pre>claude mcp add --transport http kronten {BASE}/mcp</pre>
+<p>道具: <code>list_maps</code>（地図の一覧）、<code>get_map</code>（話題・論点・出典の内訳）、<code>get_topic</code>（1つの話題の代表的な声と元の発言のURL）、<code>search_propositions</code>（論点を語で探す）。</p></section>"""
+    return _page("このシステムについて・MCP｜Kurage 論点AIマップ",
+                 "論点AIマップの作り方と、AI エージェントから使う MCP の案内。",
+                 f"{BASE}/about", body)

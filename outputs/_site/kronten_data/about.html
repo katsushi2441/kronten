@@ -1,0 +1,43 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>このシステムについて・MCP｜Kurage 論点AIマップ</title><meta name="description" content="論点AIマップの作り方と、AI エージェントから使う MCP の案内。">
+<link rel="canonical" href="https://kurage.exbridge.jp/kronten.php/about"><meta property="og:url" content="https://kurage.exbridge.jp/kronten.php/about"><meta property="og:type" content="website">
+<meta property="og:site_name" content="Kurage 論点AIマップ"><meta property="og:title" content="このシステムについて・MCP｜Kurage 論点AIマップ"><meta property="og:image" content="https://kurage.exbridge.jp/images/kurage_mascot_simple_v2.png">
+<meta name="twitter:card" content="summary"><script>(function(){var s=document.createElement("script");s.src="https://kurage.exbridge.jp/simpletrack.php?url="+encodeURIComponent(location.href)+"&ref="+encodeURIComponent(document.referrer);document.head.appendChild(s)})();</script>
+<style>
+:root{--ink:#12202f;--teal:#0a9a8f;--line:#dfe7ec;--mut:#5d6b7a;--bg:#f5f8fa}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans JP",system-ui,sans-serif;line-height:1.8}
+header{background:#fff;border-bottom:1px solid var(--line)}
+.hd{max-width:860px;margin:0 auto;padding:10px 16px} .hd a{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:900}
+.hd img{width:34px;height:34px;object-fit:contain}
+.wrap{max-width:860px;margin:0 auto;padding:22px 16px 70px;overflow-wrap:anywhere}
+.kick{color:var(--teal);font-weight:700;letter-spacing:.09em;font-size:12px;margin:0}
+h1{font-size:clamp(22px,4.8vw,32px);margin:.2em 0 .3em;font-weight:900;line-height:1.4}
+h2{font-size:19px;margin:0 0 .4em}
+.lead{color:var(--mut)}
+.hero{display:flex;gap:16px;align-items:flex-start} .hero img{width:96px;height:auto;object-fit:contain;flex:none}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(18,32,47,.05);margin:0 0 16px}
+.maps a{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;color:var(--ink);text-decoration:none;margin:0 0 8px}
+.maps b{display:block;font-size:17px} .maps small{color:var(--mut)}
+.steps{padding-left:1.3em} code,pre{background:#eef3f6;border-radius:6px;padding:1px 6px;font-size:13px}
+pre{padding:10px;overflow-x:auto} a{color:var(--teal)}
+.btn{display:inline-block;background:var(--teal);color:#fff;font-weight:800;padding:10px 18px;border-radius:99px;text-decoration:none;margin:4px 6px 0 0}
+.btn.o{background:#fff;color:var(--teal);border:1px solid var(--teal)}
+@media(max-width:560px){.hero img{width:64px}}
+</style></head><body>
+<header><div class="hd"><a href="https://kurage.exbridge.jp/kronten.php/"><img src="https://exbridge.jp/images/logo-mark-128.png" width="34" height="34" alt="株式会社エクスブリッジ">Kurage 論点AIマップ</a></div></header>
+<main class="wrap"><p class="kick">ABOUT</p><h1>このシステムについて・MCP</h1>
+<section class="card"><h2>作り方</h2><ol class="steps">
+<li>声を集める。国会の発言は国会会議録検索システムから（当社の国会トラッカー）、ネットの声は X の投稿とニュースのコメント（当社の合意点マップ）。CSV も入れられます。</li>
+<li>国会の発言は200字前後に区切り、テーマの語の組を含む部分だけを使います。</li>
+<li>意味の近さを multilingual-e5-large で計算し、KMeans でまとめます（同じ材料なら毎回同じ結果）。</li>
+<li>まとまりごとに、話題の名前・要約・論点を gemma4（手元のGPU）で作ります。</li>
+</ol>
+<p>話題の名前と論点はAIの要約です。必ず代表的な声と元の発言で確かめてください。件数は声のかたまりの数で、人数ではありません。</p></section>
+<section class="card" id="mcp"><h2>MCP（AI エージェント向け）</h2>
+<p><code>https://kurage.exbridge.jp/kronten.php/mcp</code>（Streamable HTTP・読み取り専用・登録不要）</p>
+<pre>claude mcp add --transport http kronten https://kurage.exbridge.jp/kronten.php/mcp</pre>
+<p>道具: <code>list_maps</code>（地図の一覧）、<code>get_map</code>（話題・論点・出典の内訳）、<code>get_topic</code>（1つの話題の代表的な声と元の発言のURL）、<code>search_propositions</code>（論点を語で探す）。</p></section>
+<p class="lead" style="font-size:13px">株式会社エクスブリッジ（名古屋）　<a href="https://kurage.exbridge.jp/kronten.php/about">このシステムについて・MCP</a>　<a href="https://github.com/katsushi2441/kronten">GitHub</a>　<a href="https://kappstore.exbridge.jp/?ref=kronten-foot">Kurage App Store</a></p>
+</main></body></html>

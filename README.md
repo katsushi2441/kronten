@@ -27,9 +27,9 @@
 - 埋め込みは `outputs/<slug>/embeddings.npy` に保存し、件数が同じなら読み直す。
 - 0.3 の Ollama は kojima で動いているがモデル置き場が ollama ユーザーの持ち物で、新しいモデル（bge-m3 等）を pull できない（2026-10-08）。埋め込みを CPU にしたのはそのため。
 
-## 試作の公開
+## 公開
 
-`https://proto.exbridge.jp/kronten/`（noindex）。FTP `/web/proto_exbridge_jp/kronten/`。
+公開: https://kurage.exbridge.jp/kronten.php/ （`scripts/publish.py` が kronten.php と kronten_data/ を1接続で送る）。MCP: https://kurage.exbridge.jp/kronten.php/mcp （list_maps・get_map・get_topic・search_propositions）。論点を合意点マップへ渡すのは `scripts/to_kconsensus.py`（埋め込みでほぼ同文を除き、gemma4 で「政策として賛否を問えるか・既存と同じ主張か」を判定）。
 
 ## 参考にした OSS
 

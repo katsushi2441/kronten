@@ -1,0 +1,11 @@
+{
+ "kodomo-sns": {
+  "tracker": "kodomo-sns",
+  "reactions": "kodomo-sns",
+  "links": [
+   ["合意点マップ「子どもとSNS」（論点に賛否を押す）", "https://kurage.exbridge.jp/kconsensus.php/t/kodomo-sns/?ref=kronten-kodomo-sns"],
+   ["国会トラッカー「子どもとSNS」（国会の全発言）", "https://xb4g.com/giin/tracker/kodomo-sns?ref=kronten-kodomo-sns"],
+   ["チームみらいの「みらい版Pol.is」はもうある（VWork Blog）", "https://exbridge.jp/vibeblog/2026-10-08-kconsensus-kodomo-sns-polis.html?ref=kronten-kodomo-sns"]
+  ]
+ }
+}
