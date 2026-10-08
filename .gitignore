@@ -3,3 +3,4 @@ __pycache__/
 outputs/*/embeddings.npy
 outputs/*/shot-*.png
 outputs/_deploy/
+data/mirai_gikai/

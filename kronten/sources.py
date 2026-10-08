@@ -6,6 +6,7 @@ Item = {id, text, source, who, group, role, date, url}
   role   : q（議員の質疑）/ gov（政府の答弁）/ net（ネットの声）/ csv
 """
 import csv
+import json
 import re
 import sqlite3
 
@@ -95,4 +96,27 @@ def load_csv(path, text_col="text"):
             items.append({"id": f"c{i}", "text": t, "source": r.get("source") or "CSV",
                           "who": "", "group": attrs[0] if attrs else "CSV", "role": "csv",
                           "date": r.get("date", ""), "url": r.get("url", "")})
+    return items
+
+
+MIRAI = "/home/kojima/work/kronten/data/mirai_gikai/interviews.json"
+MIRAI_CREDIT = ("データ出典：「みらい議会AIインタビュー（チームみらい）」 https://gikai.team-mir.ai/ ／ "
+                "利用規約 https://gikai.team-mir.ai/developers/interview-data-terms ／ ライセンス CC BY 4.0（加工して利用）")
+
+
+def load_mirai(bill_word):
+    """チームみらいの「みらい議会AIインタビュー」の回答（CC BY 4.0）。回答者ごとの「論点ごとの意見」（題＋本文）を1件とする。
+    scripts/fetch_mirai_gikai.py で取っておく。規約どおり、回答者を特定しようとしない（属性は回答者が名乗った区分だけ使う）"""
+    d = json.load(open(MIRAI, encoding="utf-8"))
+    items = []
+    for x in d["items"]:
+        if bill_word not in (x.get("billName") or ""):
+            continue
+        for i, o in enumerate(x.get("opinions") or []):
+            t = f"{o.get('title', '')}。{o.get('content', '')}".strip("。")
+            if len(t) < 15:
+                continue
+            items.append({"id": f"m{x['reportId'][:8]}:{i}", "text": t, "source": "チームみらいAIインタビュー",
+                          "who": x.get("roleTitle") or "", "group": x.get("roleTitle") or "", "role": "mirai",
+                          "date": (x.get("createdAt") or "")[:10], "url": "https://gikai.team-mir.ai/"})
     return items

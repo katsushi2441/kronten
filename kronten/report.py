@@ -13,7 +13,18 @@ GITHUB = "https://github.com/katsushi2441/kronten"
 MASCOT = "https://kurage.exbridge.jp/images/kurage_mascot_simple_v2.png"
 COLORS = ["#0a9a8f", "#e07a2e", "#4a6fd1", "#c2417a", "#6a9a1f", "#8a55c7", "#d4a017",
           "#2a8bb5", "#b5482a", "#3f7f5f", "#7a6a55", "#5a5ad1", "#a0336a", "#2f9e7e"]
-SRC_COLOR = {"国会（質疑）": "#4a6fd1", "国会（政府答弁）": "#7a8fb8", "X": "#12202f", "Yahooコメント": "#e07a2e"}
+SRC_COLOR = {"国会（質疑）": "#4a6fd1", "国会（政府答弁）": "#7a8fb8", "X": "#12202f", "Yahooコメント": "#e07a2e",
+             "チームみらいAIインタビュー": "#c2417a"}
+MIRAI_CREDIT = ("データ出典：「みらい議会AIインタビュー（チームみらい）」 https://gikai.team-mir.ai/ ／ "
+                "利用規約 https://gikai.team-mir.ai/developers/interview-data-terms ／ ライセンス CC BY 4.0（回答者ごとの論点別の意見を1件として、話題にまとめて利用）")
+
+
+def group_of(src):
+    if src.startswith("国会"):
+        return "国会"
+    if src == "チームみらいAIインタビュー":
+        return "インタビュー"
+    return "ネット"
 
 
 def h(s):
@@ -48,20 +59,26 @@ def scatter(m):
 
 
 def gap(m):
-    """話題を「国会が中心」「ネットが中心」「両方」に分ける（国会＝質疑＋政府答弁の割合）。"""
-    kokkai, net, both = [], [], []
+    """話題を、どこで話されているかで分ける（国会＝質疑＋政府答弁／ネット＝X・ニュースのコメント／インタビュー＝チームみらい）。
+    1つの出どころが6割以上ならその列、そうでなければ「いくつかで」"""
+    cols = {"国会": [], "ネット": [], "インタビュー": [], "いくつかで": []}
     for c in m["clusters"]:
-        k = sum(v for s, v in c["by_source"].items() if s.startswith("国会"))
-        r = k / c["size"]
-        (kokkai if r >= 0.6 else net if r <= 0.1 else both).append(c)
-    if not kokkai or not net:
+        g = {}
+        for s_, v in c["by_source"].items():
+            g[group_of(s_)] = g.get(group_of(s_), 0) + v
+        top = max(g, key=g.get)
+        cols[top if g[top] / c["size"] >= 0.6 else "いくつかで"].append(c)
+    used = [k for k in ("国会", "ネット", "インタビュー") if any(group_of(s_) == k for s_ in m["sources"])]
+    if len(used) < 2:
         return ""
-    li = lambda cs: "".join(f'<li><a href="#t{c["id"]}">{h(c["name"])}</a> <small>{c["size"]}件</small></li>' for c in cs)
-    return f"""<section class="card gap"><p class="sub" style="margin-top:0">国会とネットのずれ</p>
-<div class="g2"><div><b>国会で話されている話題</b><ul>{li(kokkai)}</ul></div>
-<div><b>ネットで話されている話題</b><ul>{li(net)}</ul></div></div>
-{('<p class="note">両方で話されている話題: ' + '、'.join(h(c['name']) for c in both) + '</p>') if both else ''}
-<p class="note">国会の声（質疑・政府答弁）が6割以上のまとまりを「国会」、1割以下を「ネット」に分けています。</p></section>"""
+    li = lambda cs: "".join(f'<li><a href="#t{c["id"]}">{h(c["name"])}</a> <small>{c["size"]}件</small></li>' for c in cs) or "<li class='mut'>なし</li>"
+    label = {"国会": "国会で話されている話題", "ネット": "ネットで話されている話題", "インタビュー": "チームみらいのAIインタビューで話されている話題"}
+    boxes = "".join(f"<div><b>{label[k]}</b><ul>{li(cols[k])}</ul></div>" for k in used)
+    both = cols["いくつかで"]
+    return f"""<section class="card gap"><p class="sub" style="margin-top:0">{'・'.join(used)}のずれ</p>
+<div class="g2">{boxes}</div>
+{('<p class="note">いくつかの出どころにまたがる話題: ' + '、'.join(h(c['name']) for c in both) + '</p>') if both else ''}
+<p class="note">1つの出どころの声が6割以上のまとまりを、その出どころの話題としています。{'チームみらいのAIインタビューの意見は、AIが回答を要約した文で書きぶりがそろっているため、話題の違いだけでなく文体の違いでも分かれている可能性があります。インタビューの話題は、AIが尋ねた質問に沿って並びます。' if 'インタビュー' in used else ''}</p></section>"""
 
 
 def render(m, slug="", links=None):
@@ -139,7 +156,7 @@ details{{margin-top:.8em}} summary{{cursor:pointer;color:var(--teal);font-weight
 .toc b{{white-space:nowrap;margin-left:auto;color:var(--mut);font-weight:400;font-size:12px}}
 svg{{width:100%;height:auto;background:#fbfdfd;border:1px solid var(--line);border-radius:12px}}
 svg .cl{{font-size:11px;font-weight:900;fill:#12202f}}
-.g2{{display:grid;grid-template-columns:1fr 1fr;gap:16px}} .g2 ul{{margin:.3em 0 0;padding-left:1.1em}} .g2 a{{color:var(--ink)}}
+.g2{{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}} .g2 ul{{margin:.3em 0 0;padding-left:1.1em}} .g2 a{{color:var(--ink)}}
 @media(max-width:560px){{.g2{{grid-template-columns:1fr}} .hero img{{width:60px}}}}
 .rel{{margin:0;padding-left:1.1em}} .rel a{{color:var(--teal)}}
 .mut,.note{{color:var(--mut);font-size:13px}}
@@ -159,6 +176,7 @@ svg .cl{{font-size:11px;font-weight:900;fill:#12202f}}
 <section class="card note"><p class="sub" style="margin-top:0">作り方</p>
 <p>国会の発言は、国会会議録検索システムから当社の国会トラッカーが集めたもの（発言を200字前後に区切り、テーマの語を含む部分だけ）。ネットの声は、当社の合意点マップに取り込んだ X の投稿と Yahoo!ニュースのコメントです。</p>
 <p>意味の近さは {h(m['embed_model'])}（手元のCPUで計算）、まとめ方は KMeans（同じ材料なら毎回同じ結果）、話題の名前・要約・論点は {h(m['llm'])}（手元のGPU）で作りました。外部のAIには送っていません。名前と論点はAIの要約なので、必ず代表的な声と元の発言で確かめてください。件数は「声のかたまりの数」で、人数ではありません。</p>
+{('<p>' + h(MIRAI_CREDIT) + '</p>') if 'チームみらいAIインタビュー' in m['sources'] else ''}
 <p>作成 {h(m.get('built_at', ''))}　株式会社エクスブリッジ（名古屋）</p></section>
 {('<section class="card"><p class="sub" style="margin-top:0">関連するページ</p><ul class="rel">' + ''.join(f'<li><a href="{h(u)}">{h(t)}</a></li>' for t, u in links) + '</ul></section>') if links else ''}
 <section class="card"><p class="sub" style="margin-top:0">このシステムについて</p>

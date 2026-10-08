@@ -24,6 +24,7 @@ def main():
     ap.add_argument("--tracker", help="xb4g 国会トラッカーの key")
     ap.add_argument("--reactions", help="kconsensus の論点 slug（ネットの声）")
     ap.add_argument("--csv", help="任意の CSV（text 列・attribute_* 列）")
+    ap.add_argument("--mirai", help="みらい議会AIインタビュー（チームみらい・CC BY 4.0）の法案名に含む語")
     ap.add_argument("--k", type=int, default=0)
     a = ap.parse_args()
     items, theme = [], a.theme
@@ -36,6 +37,10 @@ def main():
         its = sources.load_reactions(a.reactions)
         items += its
         print(f"ネットの声: {len(its)}")
+    if a.mirai:
+        its = sources.load_mirai(a.mirai)
+        items += its
+        print(f"チームみらいAIインタビューの意見: {len(its)}")
     if a.csv:
         its = sources.load_csv(a.csv)
         items += its
