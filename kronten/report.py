@@ -78,7 +78,28 @@ def gap(m):
     return f"""<section class="card gap"><p class="sub" style="margin-top:0">{'・'.join(used)}のずれ</p>
 <div class="g2">{boxes}</div>
 {('<p class="note">いくつかの出どころにまたがる話題: ' + '、'.join(h(c['name']) for c in both) + '</p>') if both else ''}
-<p class="note">1つの出どころの声が6割以上のまとまりを、その出どころの話題としています。{'チームみらいのAIインタビューの意見は、AIが回答を要約した文で書きぶりがそろっているため、話題の違いだけでなく文体の違いでも分かれている可能性があります。インタビューの話題は、AIが尋ねた質問に沿って並びます。' if 'インタビュー' in used else ''}</p></section>"""
+<p class="note">1つの出どころの声が6割以上のまとまりを、その出どころの話題としています。同じ論点が複数の出どころで話されていることもあるので、下の「論点の網目」とあわせて読んでください。{'チームみらいのAIインタビューの意見は、AIが回答を要約した文で書きぶりがそろっているため、話題の違いだけでなく文体の違いでも分かれている可能性があります。インタビューの話題は、AIが尋ねた質問に沿って並びます。' if 'インタビュー' in used else ''}</p></section>"""
+
+
+GROUP_COLOR = {"国会": "#4a6fd1", "ネット": "#12202f", "インタビュー": "#c2417a"}
+
+
+def mesh(m):
+    """網目状の論点の表（1つの声が複数の論点に当てはまってよい）。論点ごとに、出どころ別に何%の声が触れているか"""
+    me = m.get("mesh")
+    if not me:
+        return ""
+    gs = me["groups"]
+    head = "".join(f'<th>{h(g)}<small>{me["totals"][g]:,}件</small></th>' for g in gs)
+    body = ""
+    for r in sorted(me["rows"], key=lambda r: -max(v["pct"] for v in r["by_group"].values())):
+        cells = "".join(
+            f'<td><div class="mb"><span style="width:{min(100, r["by_group"][g]["pct"] * 2):.0f}%;background:{GROUP_COLOR.get(g, "#9fb3c0")}"></span></div>'
+            f'<b>{r["by_group"][g]["pct"]:.0f}%</b><small>{r["by_group"][g]["n"]}件</small></td>' for g in gs)
+        body += f'<tr><th class="ln">{h(r["name"])}<small>{h(r["desc"])}</small></th>{cells}</tr>'
+    return f"""<section class="card"><p class="sub" style="margin-top:0">論点の網目（1つの声が複数の論点に当てはまる）</p>
+<p class="note">上の地図は1つの声を1つの話題にしか入れないため、同じ観点でも出どころの書きぶりが違うと別の話題に分かれ、重なりが見えにくくなります。ここでは論点の一覧を決め、声ごとに当てはまる論点を全部付けて、出どころごとに何%の声がその論点に触れているかを並べました（棒は50%で端まで）。2つ以上の論点に当たる声は{me['multi']:.0f}%、どれにも当たらない声は{me['none']:.0f}%です。</p>
+<div class="scroll"><table class="mesh"><tr><th></th>{head}</tr>{body}</table></div></section>"""
 
 
 def render(m, slug="", links=None):
@@ -159,6 +180,10 @@ svg .cl{{font-size:11px;font-weight:900;fill:#12202f}}
 .g2{{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}} .g2 ul{{margin:.3em 0 0;padding-left:1.1em}} .g2 a{{color:var(--ink)}}
 @media(max-width:560px){{.g2{{grid-template-columns:1fr}} .hero img{{width:60px}}}}
 .rel{{margin:0;padding-left:1.1em}} .rel a{{color:var(--teal)}}
+.scroll{{overflow-x:auto}} table.mesh{{border-collapse:collapse;width:100%;min-width:520px;font-size:13px}}
+.mesh th,.mesh td{{border-bottom:1px solid var(--line);padding:6px 6px;text-align:left;vertical-align:top}}
+.mesh th small,.mesh td small{{display:block;font-weight:400;color:var(--mut);font-size:11px}} .mesh th.ln{{width:38%}}
+.mb{{height:8px;background:#eef2f5;border-radius:4px;overflow:hidden;margin:3px 0}} .mb span{{display:block;height:100%}}
 .mut,.note{{color:var(--mut);font-size:13px}}
 </style></head><body>
 <header><div class="hd"><a href="{BASE}/"><img src="{LOGO}" width="34" height="34" alt="株式会社エクスブリッジ">Kurage 論点AIマップ</a></div></header>
@@ -170,6 +195,7 @@ svg .cl{{font-size:11px;font-weight:900;fill:#12202f}}
 </div><img src="{MASCOT}" width="84" height="84" alt="Kurage"></div>
 <section class="card"><p class="sub" style="margin-top:0">材料（どこから拾った声か）</p>{bar(m['sources'], total, SRC_COLOR)}</section>
 {gap(m)}
+{mesh(m)}
 <section class="card"><p class="sub" style="margin-top:0">話題の一覧</p><div class="toc">{toc}</div></section>
 <section class="card"><p class="sub" style="margin-top:0">話題の地図（1点が1つの声。近いほど意味が近い）</p>{scatter(m)}</section>
 {''.join(cards)}
