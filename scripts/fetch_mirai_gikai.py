@@ -8,6 +8,8 @@
   利用規約 https://gikai.team-mir.ai/developers/interview-data-terms ／ ライセンス CC BY 4.0
 - 規約で禁じられていること: 回答者の再識別・それを目的とした照合、誹謗中傷、特定の個人・団体に不利益を与える使い方。
   使った成果物には上の出典・提供元URL・規約URL・ライセンスを書く。
+- 1回10件ずつ取る。1回のやりとり（messages）の合計が1,000件に達すると打ち切られる不具合がある
+  （2026-10-08、Xで教わって確認: 100件ずつだと388件中271件のやりとりが空。意見 opinions は全件そろっていた）。
 - 1ページずつ2秒あけて取る（相手のサーバーに負担をかけない）。
 """
 import json, os, time, urllib.parse, urllib.request
@@ -20,7 +22,7 @@ API = "https://gikai.team-mir.ai/api/open-data/interviews"
 def main():
     items, cursor, n = [], "", 0
     while True:
-        q = {"agreeToTerms": "true", "limit": "100"}
+        q = {"agreeToTerms": "true", "limit": "10"}
         if cursor:
             q["cursor"] = cursor
         d = json.load(urllib.request.urlopen(urllib.request.Request(API + "?" + urllib.parse.urlencode(q),
