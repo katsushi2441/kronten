@@ -8,6 +8,7 @@
  *   /                 一覧（kronten_data/index.html）
  *   /about            作り方・MCP
  *   /t/<slug>/        テーマごとの地図（kronten_data/t_<slug>.html）
+ *   /x/<投稿の番号>   Xの反応マップ（kronten_data/x_<番号>.html と .png）
  *   /mcp              MCP（Streamable HTTP・JSON-RPC・読み取り専用・セッションなし）
  *   /sitemap.xml
  */
@@ -203,4 +204,11 @@ if ($path === '/sitemap.xml') {
 if ($path === '/') { kr_send_html($KR_DIR . '/index.html'); }
 if ($path === '/about') { kr_send_html($KR_DIR . '/about.html'); }
 if (preg_match('#^/t/([a-z0-9-]+)$#', $path, $mm)) { kr_send_html($KR_DIR . '/t_' . $mm[1] . '.html'); }
+// Xの反応マップ（scripts/build_xmap.py が手元で作って置く。ページは noindex）
+if (preg_match('#^/x/(\d{6,25})\.png$#', $path, $mm)) {
+    $f = $KR_DIR . '/x_' . $mm[1] . '.png';
+    if (!is_file($f)) { kr_404(); }
+    header('Content-Type: image/png'); header('Cache-Control: public, max-age=3600'); readfile($f); exit;
+}
+if (preg_match('#^/x/(\d{6,25})$#', $path, $mm)) { kr_send_html($KR_DIR . '/x_' . $mm[1] . '.html'); }
 kr_404();
