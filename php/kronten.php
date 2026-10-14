@@ -203,6 +203,11 @@ if ($path === '/sitemap.xml') {
 
 if ($path === '/') { kr_send_html($KR_DIR . '/index.html'); }
 if ($path === '/about') { kr_send_html($KR_DIR . '/about.html'); }
+if (preg_match('#^/t/([a-z0-9-]+)\.png$#', $path, $mm)) {
+    $f = $KR_DIR . '/t_' . $mm[1] . '.png';
+    if (!is_file($f)) { kr_404(); }
+    header('Content-Type: image/png'); header('Cache-Control: public, max-age=3600'); readfile($f); exit;
+}
 if (preg_match('#^/t/([a-z0-9-]+)$#', $path, $mm)) { kr_send_html($KR_DIR . '/t_' . $mm[1] . '.html'); }
 // Xの反応マップ（scripts/build_xmap.py が手元で作って置く。ページは noindex）
 if (preg_match('#^/x/(\d{6,25})\.png$#', $path, $mm)) {

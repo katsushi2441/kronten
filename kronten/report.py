@@ -140,8 +140,8 @@ def render(m, slug="", links=None):
 <meta name="description" content="{h(m['theme'])}について、国会の発言とネットの声{total:,}件を{m['k']}つの話題にまとめ、賛否を問える論点を立てました。国会とネットで話題がどうずれているかも分かります。">
 {f'<link rel="canonical" href="{url}"><meta property="og:url" content="{url}">' if url else ''}
 <meta property="og:type" content="article"><meta property="og:site_name" content="Kurage 論点AIマップ">
-<meta property="og:title" content="{h(m['theme'])}の論点AIマップ"><meta property="og:image" content="{MASCOT}">
-<meta name="twitter:card" content="summary">
+<meta property="og:title" content="{h(m['theme'])}の論点AIマップ"><meta property="og:image" content="{(BASE + '/t/' + slug + '.png') if slug else MASCOT}">
+<meta name="twitter:card" content="{'summary_large_image' if slug else 'summary'}">
 {TRACK if slug else ''}
 <style>
 :root{{--ink:#12202f;--teal:#0a9a8f;--line:#dfe7ec;--mut:#5d6b7a;--bg:#f5f8fa}}

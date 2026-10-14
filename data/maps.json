@@ -25,5 +25,14 @@
    ]
   ],
   "mirai": "青少年インターネット"
+ },
+ "kosenho-kifu-baishu": {
+  "tracker": "kosenho-kifu-baishu",
+  "links": [
+   [
+    "国会トラッカー「公職選挙法の寄附・買収（無料送迎・供応）」（国会の全発言）",
+    "https://xb4g.com/giin/tracker/kosenho-kifu-baishu#ref=kronten-kosenho"
+   ]
+  ]
  }
 }

@@ -44,6 +44,8 @@ def main():
         maps.append((slug, m))
         open(os.path.join(SITE, "kronten_data", f"t_{slug}.html"), "w", encoding="utf-8").write(
             report.render(m, slug=slug, links=c.get("links", [])))
+        from kronten import mapcard
+        mapcard.draw(m, os.path.join(SITE, "kronten_data", f"t_{slug}.png"), slug)   # Xに貼ったときのカード
         slim = {k: v for k, v in m.items() if k != "points"}
         json.dump(slim, open(os.path.join(SITE, "kronten_data", "maps", f"{slug}.json"), "w", encoding="utf-8"), ensure_ascii=False)
     open(os.path.join(SITE, "kronten_data", "index.html"), "w", encoding="utf-8").write(report.render_index(maps))
