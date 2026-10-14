@@ -98,7 +98,11 @@ def draw(m, path):
         y += 62
     fr = ImageFont.truetype(FR, 16)
     dr.text((X, H - 26), f"{BASE.replace('https://', '')}/x/{m['id']}", font=fr, fill="#5d6b7a", anchor="lm")
-    dr.text((W - X, H - 26), f"返信{p['replies']}件のうち、いいね上位と新しい順に集めた分をAIで分類（人の数ではありません）",
+    # 全部集めたときは「すべて」、一部のときは「うち…集めた分」（2026-10-14 玉木代表の投稿は17件すべてだった）
+    whole = m["n"] >= (p.get("replies") or 0)
+    note = (f"返信{m['n']}件をすべてAIで分類（人の数ではありません）" if whole
+            else f"返信{p['replies']}件のうち、いいね上位と新しい順に集めた{m['n']}件をAIで分類（人の数ではありません）")
+    dr.text((W - X, H - 26), note,
             font=_fit(dr, "x" * 10, FR, 16, 9999), fill="#5d6b7a", anchor="rm")
     img.save(path, optimize=True)
 
@@ -139,7 +143,7 @@ blockquote{{margin:0;padding:10px 14px;border-left:4px solid #0a9a8f;background:
 <h2>多かった話題</h2><div class="panel"><ul>{tops}</ul><p class="note">話題の名前と要約はAIが付けたものです。返信の原文や、返信した人の名前は載せていません。</p></div>
 <h2>集め方と、読み方の注意</h2><div class="panel"><p>この投稿への返信 {p['replies']}件のうち、<b>{m['n']}件</b>（{e(src)}）を集め、
 ローカルのAI（{e(m['model'].split(':')[0])}）で「元の投稿の主張に対する立場」と「話題」に分けました（{e(m['built_at'])} 時点）。</p>
-<ul><li><b>全部の返信ではありません。</b>いいねの多い返信と新しい返信が中心で、ほかの返信とは割合が違うことがあります</li>
+<ul>{'<li>集めた時点の返信は<b>すべて</b>入っています。そのあとに付いた返信は入っていません</li>' if m['n'] >= (p.get('replies') or 0) else '<li><b>全部の返信ではありません。</b>いいねの多い返信と新しい返信が中心で、ほかの返信とは割合が違うことがあります</li>'}
 <li>割合は<b>返信の数</b>で、人の数ではありません（同じ人の複数の返信も1件ずつ数えます）</li>
 <li>立場は皮肉や反語も含めてAIが読んだもので、読み違いがあります。引用リツイートは入っていません</li></ul></div>
 <p class="note">作っている会社：<a href="https://exbridge.jp/#ref=xmap">株式会社エクスブリッジ</a>（名古屋のAIシステム開発会社）。
