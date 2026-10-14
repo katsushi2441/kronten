@@ -4,3 +4,5 @@ outputs/*/embeddings.npy
 outputs/*/shot-*.png
 outputs/_deploy/
 data/mirai_gikai/
+# Xの反応マップの材料（集めた返信の原文が入る。公開リポジトリに入れない）
+outputs/x/
